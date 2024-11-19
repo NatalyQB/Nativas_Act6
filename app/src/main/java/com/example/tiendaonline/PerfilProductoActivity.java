@@ -1,11 +1,12 @@
 package com.example.tiendaonline;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,7 +17,7 @@ import java.net.URL;
 public class PerfilProductoActivity extends AppCompatActivity {
 
     private TextView txtCodigo, txtNombre, txtPrecio;
-    private Button btnBorrar;
+    private Button btnBorrar, btnComprar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,7 @@ public class PerfilProductoActivity extends AppCompatActivity {
         txtNombre = findViewById(R.id.txtNombre);
         txtPrecio = findViewById(R.id.txtPrecio);
         btnBorrar = findViewById(R.id.btnBorrar);
+        btnComprar = findViewById(R.id.btnComprar);
 
         String codigoProducto = getIntent().getStringExtra("codigo");
         String nombreProducto = getIntent().getStringExtra("nombre");
@@ -37,12 +39,46 @@ public class PerfilProductoActivity extends AppCompatActivity {
         txtNombre.setText("Nombre: " + nombreProducto);
         txtPrecio.setText("Precio: " + precioProducto);
 
+        // Configurar el botón "Comprar"
+        btnComprar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                agregarAlCarrito(codigoProducto, nombreProducto, precioProducto);
+            }
+        });
+
+        // Configurar el botón "Borrar"
         btnBorrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new EliminarProductoTask(codigoProducto).execute();
             }
         });
+    }
+
+    // Método para agregar el producto al carrito
+    private void agregarAlCarrito(String codigo, String nombre, String precio) {
+        SharedPreferences prefs = getSharedPreferences("Carrito", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        String carrito = prefs.getString("productos", "");
+
+        String nuevoProducto = codigo + "," + nombre + "," + precio;
+
+        if (carrito.isEmpty()) {
+            carrito = nuevoProducto;
+        } else {
+            carrito += ";" + nuevoProducto;
+        }
+
+        editor.putString("productos", carrito);
+        boolean success = editor.commit();
+
+        if (success) {
+            Toast.makeText(PerfilProductoActivity.this, "Producto añadido al carrito", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(PerfilProductoActivity.this, "Error al añadir el producto al carrito", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private class EliminarProductoTask extends AsyncTask<Void, Void, Boolean> {
@@ -55,13 +91,11 @@ public class PerfilProductoActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-
                 URL url = new URL("https://apitienda.techcloud.com.co/api_tienda/borrar_producto.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setDoOutput(true);
-
 
                 String jsonInputString = "{\"codigo\":\"" + codigo + "\"}";
 

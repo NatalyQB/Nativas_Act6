@@ -1,21 +1,19 @@
 package com.example.tiendaonline;
 
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CarritoComprasActivity extends AppCompatActivity {
 
-    private TextView txtTotalCarrito;
+    private TextView tvMensaje;
     private Button btnComprar;
     private List<Producto> carrito;
 
@@ -24,70 +22,44 @@ public class CarritoComprasActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_carrito_compras);
 
-
-        TextView txtTotalCarrito = findViewById(R.id.txtTotalCarrito);
+        tvMensaje = findViewById(R.id.tvMensaje);
         btnComprar = findViewById(R.id.btnComprar);
-        LinearLayout layoutCarrito = findViewById(R.id.layoutCarrito);
 
         carrito = new ArrayList<>();
 
-
-        SharedPreferences prefs = getSharedPreferences("Carrito", MODE_PRIVATE);
-        String productos = prefs.getString("productos", "");
-
-        if (!productos.isEmpty()) {
-            String[] productosArray = productos.split(";");
-            for (String producto : productosArray) {
-                String[] datosProducto = producto.split(",");
-                String codigo = datosProducto[0];
-                String nombre = datosProducto[1];
-                String precio = datosProducto[2];
-
-
-                View productoView = getLayoutInflater().inflate(R.layout.item_producto, layoutCarrito, false);
-                TextView txtNombreCarrito = productoView.findViewById(R.id.txtNombreCarrito);
-                TextView txtPrecioCarrito = productoView.findViewById(R.id.txtPrecioCarrito);
-
-                txtNombreCarrito.setText("Nombre: " + nombre);
-                txtPrecioCarrito.setText("Precio: " + precio);
-
-
-                layoutCarrito.addView(productoView);
-
-
-                carrito.add(new Producto(codigo, nombre, precio));
-            }
-        } else {
-            Toast.makeText(this, "Tu carrito está vacío", Toast.LENGTH_SHORT).show();
+        List<Producto> carritoRecuperado = (List<Producto>) getIntent().getSerializableExtra("carrito");
+        if (carritoRecuperado != null) {
+            carrito.addAll(carritoRecuperado);
         }
-
 
         mostrarProductos();
 
+        btnComprar.setOnClickListener(v -> {
+            if (carrito.isEmpty()) {
+                Toast.makeText(this, "El carrito está vacío", Toast.LENGTH_SHORT).show();
+            } else {
 
-        btnComprar.setOnClickListener(v -> realizarCompra());
+                realizarCompra();
+            }
+        });
     }
 
     private void mostrarProductos() {
         if (carrito.isEmpty()) {
-            txtTotalCarrito.setText("El carrito está vacío.");
+            tvMensaje.setText("El carrito está vacío.");
             btnComprar.setEnabled(false);
-            btnComprar.setBackgroundColor(ContextCompat.getColor(this, R.color.colorGris)); // Usar ContextCompat
-            return;
+            btnComprar.setBackgroundColor(getResources().getColor(R.color.colorGris));           return;
         }
 
         StringBuilder mensaje = new StringBuilder("Productos en el carrito:\n");
         for (Producto producto : carrito) {
-            mensaje.append(producto.getNombre())
-                    .append(" - $")
-                    .append(producto.getPrecio())
-                    .append("\n");
+            mensaje.append(producto.getNombre()).append(" - ").append(producto.getPrecio()).append("\n");
         }
+        tvMensaje.setText(mensaje.toString());
 
-        txtTotalCarrito.setText(mensaje.toString());
 
         btnComprar.setEnabled(true);
-        btnComprar.setBackgroundColor(ContextCompat.getColor(this, R.color.colorVerde)); // Usar ContextCompat
+        btnComprar.setBackgroundColor(getResources().getColor(R.color.colorVerde)); // Cambia a color verde
     }
 
     private void realizarCompra() {

@@ -4,41 +4,48 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Perfil del producto"
-        android:textSize="24sp"
-        android:textColor="@color/white"
-        android:layout_marginBottom="16dp"/>
-
     <TextView
         android:id="@+id/txtCodigo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp" />
+        android:text="Código:"
+        android:textSize="18sp"
+        android:paddingBottom="8dp"/>
 
     <TextView
         android:id="@+id/txtNombre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp" />
+        android:text="Nombre:"
+        android:textSize="18sp"
+        android:paddingBottom="8dp"/>
 
     <TextView
         android:id="@+id/txtPrecio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp" />
+        android:text="Precio:"
+        android:textSize="18sp"
+        android:paddingBottom="16dp"/>
 
     <Button
         android:id="@+id/btnBorrar"
-        android:layout_width="134dp"
+        android:layout_width="165dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="#FF6200EE"
-        android:text="Borrar"
-        android:textColor="@color/black" />
+        android:background="@color/purple_200"
+        android:layout_marginTop="30dp"
+        android:text="Eliminar Producto"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btnComprar"
+        android:layout_width="163dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="@color/pastel"
+        android:text="Comprar"
+
+        android:textSize="18sp" />
 
 
 </LinearLayout>
